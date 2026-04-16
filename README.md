@@ -189,7 +189,7 @@ even if the exact command names differ:
 - `task create`, `task list`, `task claim`, `task update`
   - Operates on a shared task queue visible to all team members.
 - `message send`
-  - Sends durable asynchronous messages by worker name.
+  - Sends durable asynchronous messages to a named worker.
 - `agent shutdown`
   - Requests graceful worker termination through the coordination layer.
 
@@ -251,7 +251,9 @@ The Copilot CLI port should preserve these behaviors:
 - a new team can start with a fresh task namespace
 
 If the port skips the shared task queue, the feature collapses into loosely
-coordinated parallel chat instead of actual multi-agent execution.
+coordinated parallel chat instead of actual multi-agent execution because task
+claiming, ownership, and dependency tracking are what make delegated work
+observable and schedulable across workers.
 
 #### Mailbox or message bus
 
@@ -426,7 +428,8 @@ Cleanup must be explicit and graceful.
 Required behavior:
 
 - shutdown should be requested, not assumed
-- workers should acknowledge or be marked inactive after timeout handling
+- workers should acknowledge or be marked inactive after a defined shutdown
+  grace period owned by the CLI runtime
 - team deletion should be blocked while workers are still active
 - deleting a team should also clean shared task and mailbox state
 
